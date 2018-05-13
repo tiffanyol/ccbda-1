@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}<title>Local Library</title>{% endblock %}
+</head>
+
+<body>
+{% if messages %}
+    <div class="row">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible"
+                 role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div>
+                    <p><strong>
+                        {% if message.tags == 'danger' %}Error!
+                        {% elif message.tags == 'warning' %}Warning!
+                        {% endif %}</strong>&nbsp;{{ message }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% block sidebar %}<!-- insert default navigation text for every page -->{% endblock %}
+{% block content %}<!-- default content text (typically empty) -->{% endblock %}
+</body>
+</html>

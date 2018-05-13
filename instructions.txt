@@ -1,0 +1,14 @@
+source activate LabEnvironmentMac
+python manage.py startapp authfib
+
+# http://requests-oauthlib.readthedocs.io/en/latest/api.html#oauth-2-0
+# https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2
+
+# start all over again
+python manage.py showmigrations
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc"  -delete
+rm db.sqlite3
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
