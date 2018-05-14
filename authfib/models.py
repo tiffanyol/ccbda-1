@@ -30,6 +30,7 @@ def apiGetToken(request, redirect_uri):
     request.session['token_type'] = token['token_type']
     request.session['access_token'] = token['access_token']
     request.session['refresh_token'] = token['refresh_token']
+    request.session['auth_token'] = '%s %s' % (token['token_type'], token['access_token'])
     request.session.set_expiry(token['expires_in'])
     return True
 
@@ -51,10 +52,10 @@ def apiLogout(request):
     return
 
 
-def apiCall(request, uri, accept_type='application/json'):
+def apiCall(request, uri, accept_type='*/*'):
     headers = {'Cache-Control': 'no-cache',
                'Accept': accept_type,
-               'Authorization': '%s %s' % (request.session.get('token_type'), request.session['access_token']),
+               'Authorization': request.session['auth_token'],
                }
     response = requests.get(url=settings.AUTH_URL + uri, headers=headers)
     if response.status_code != 200:
@@ -64,4 +65,4 @@ def apiCall(request, uri, accept_type='application/json'):
     if accept_type == 'application/json':
         return json.loads(response.text)
     else:
-        return None
+        return response.headers['Content-Type'], response.content

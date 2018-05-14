@@ -1,4 +1,6 @@
 from inspect import currentframe, getframeinfo
+import base64
+import binascii
 
 from django.conf import settings
 from django.contrib import messages
@@ -36,7 +38,15 @@ def logout(request):
 def profile(request):
     if request.user.is_authenticated:
         result = apiCall(request, uri='jo/', accept_type='application/json')
-        return render(request, 'profile.html', result)
+        user = {
+            'nom': result['nom'],
+            'cognoms': result['cognoms'],
+            'email': result['email'],
+            'username': result['username'],
+        }
+        result_type, result_object = apiCall(request, uri='jo/foto.jpg')
+        user['foto'] = 'data:%s;base64, %s'%(result_type, base64.b64encode(result_object).decode())
+        return render(request, 'profile.html', user)
     return render(request, 'profile.html')
 
 

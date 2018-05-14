@@ -7,6 +7,7 @@
             {{ cognoms }}<br/>
             {{ email }}
             {{ username }}
+            <img src="{{ foto }}"/>
         </p>
         <p><a href="{% url 'authfib:logout' %}">Logout</a>.</p>
     {% else %}
