@@ -44,8 +44,23 @@ def profile(request):
             'email': result['email'],
             'username': result['username'],
         }
+
         result_type, result_object = apiCall(request, uri='jo/foto.jpg')
-        user['foto'] = 'data:%s;base64, %s'%(result_type, base64.b64encode(result_object).decode())
+        user['foto'] = 'data:%s;base64, %s' % (result_type, base64.b64encode(result_object).decode())
+
+        result = apiCall(request, uri='jo/assignatures/', accept_type='application/json')
+        user['subjects'] = []
+        for subject in result['results']:
+            user['subjects'].append({
+                'id': subject['id'], 'nom': subject['nom'], 'grup': subject['grup']
+            })
+
+        result = apiCall(request, uri='jo/avisos/', accept_type='application/json')
+        user['notices'] = []
+        for notice in result['results']:
+            user['notices'].append({
+                'titol': notice['titol'], 'codi_assig': notice['codi_assig'], 'text': notice['text'], 'data_modificacio': notice['data_modificacio']
+            })
         return render(request, 'profile.html', user)
     return render(request, 'profile.html')
 

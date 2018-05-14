@@ -1,15 +1,52 @@
 {% extends "base_generic.html" %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% load static %}
 
 {% block content %}
     {% if user.is_authenticated %}
-        <p>
-            {{ nom }}
-            {{ cognoms }}<br/>
-            {{ email }}
-            {{ username }}
-            <img src="{{ foto }}"/>
-        </p>
-        <p><a href="{% url 'authfib:logout' %}">Logout</a>.</p>
+        <div class="row">
+            <div class="col-lg-10">
+                <ul class="nav nav-tabs" id="subjects" role="tablist">
+                    {% for subject in subjects %}
+                        <li class="nav-item">
+                            <a class="nav-link{% if forloop.first %} active{% endif %}" id="{{ subject.id }}-tab"
+                               data-toggle="tab" href="#{{ subject.id }}" role="tab" aria-controls="{{ subject.id }}"
+                               aria-selected="{{ forloop.first }}">
+                                {{ subject.id }}
+                                {% if subject.grup %}Group {{ subject.grup }}{% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="tab-content" id="notices">
+                    {% for subject in subjects %}
+                        <div class="tab-pane fade show{% if forloop.first %} active{% endif %}" id="{{ subject.id }}"
+                             role="tabpanel" aria-labelledby="{{ subject.id }}-tab">
+                            {% for notice in notices %}
+                                {% if subject.id == notice.codi_assig %}
+                                    <article><h3>{{ notice.titol }}</h3>
+                                        <h4>{{ notice.data_modificacio }}</h4>
+                                        {{ notice.text|safe }}
+                                    </article>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="card">
+                    <img class="card-img-top" src="{{ foto }}"/>
+                    <div class="card-body">
+                        <p class="card-text smaller">
+                            {{ email }}
+                            {{ username }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% else %}
         <p>Please <a href="{% url 'authfib:login' %}">login</a> to see this page.</p>
     {% endif %}

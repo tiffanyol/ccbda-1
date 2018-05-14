@@ -1,30 +1,200 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
-    {% block title %}<title>Local Library</title>{% endblock %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.fib.upc.edu/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.fib.upc.edu/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.fib.upc.edu/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://www.fib.upc.edu/android-chrome-192x192.png">
+    <link rel="mask-icon" href="https://www.fib.upc.edu/safari-pinned-tab.svg" color="#21c2f8">
+    <link rel="manifest" href="https://www.fib.upc.edu/manifest.json">
+    <title>{% block title %}{% trans "Demo FIB" %}{% endblock %}</title>
+    <!-- Styles -->
+    <!-- https://www.bootstrapcdn.com/ -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+    <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
+    {% block css %}{% endblock %}
 </head>
-
 <body>
-{% if messages %}
-    <div class="row">
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible"
-                 role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <div>
-                    <p><strong>
-                        {% if message.tags == 'danger' %}Error!
-                        {% elif message.tags == 'warning' %}Warning!
-                        {% endif %}</strong>&nbsp;{{ message }}
-                    </p>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/"><img src="https://www.fib.upc.edu/sites/fib/files/images/logo-fib.png"
+                                              style="width: 300px;"
+                                              title="{% trans 'fib home' %}" alt="{% trans 'fib home' %}"></a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+            {% trans "Toggle Navigation" %}
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'authfib:profile' %}">{{ request.user.first_name }} {{ request.user.last_name }}</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'authfib:logout' %}">{% trans 'Logout' %}</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'authfib:login' %}">{% trans 'Login' %}</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <form id="langswitcher" action="#" method="post">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ redirect_to }}">
+                        <select name="language">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %}
+                                        selected{% endif %}>
+                                    {{ language.name_local|slice:"0:3"|upper }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% block header %}
+    <header class="masthead" style="background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIElEQVQYV2NkQALKGpr/GUHE3RvX4TQjSAFMEMTGUAEAQEYVeAzRHdMAAAAASUVORK5CYII=) repeat;">
+        <div class="overlay" style="background-image: url({% static 'img/museu-portada-fib.jpg' %}); background-position: center" ></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <h1>Demo Website</h1>
+                        <span class="subheading">{% trans "Facultat d'Informàtica de Barcelona" %}</span>
+                    </div>
                 </div>
             </div>
-        {% endfor %}
+        </div>
+    </header>
+{% endblock %}
+<div class="container">
+    {% block submenu %}<!-- app submenu -->{% endblock %}
+    {% block feedback %}
+        {% if messages %}
+            <div class="row">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible"
+                         role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <div>
+                            <p><strong>
+                                {% if message.tags == 'danger' %}Error!
+                                {% elif message.tags == 'warning' %}Warning!
+                                {% endif %}</strong>&nbsp;{{ message }}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
+    {% block content %}<!-- default content text -->{% endblock %}
+</div>
+<footer class="sticky-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <ul class="list-inline text-center">
+                    <li class="list-inline-item">
+                        <a href="#">
+                  <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                  </span>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#">
+                  <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                  </span>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#">
+                  <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                        </a>
+                    </li>
+                </ul>
+                <p class="copyright text-muted">Made in Barcelona, 2018</p>
+            </div>
+        </div>
     </div>
-{% endif %}
-{% block sidebar %}<!-- insert default navigation text for every page -->{% endblock %}
-{% block content %}<!-- default content text (typically empty) -->{% endblock %}
+</footer>
+<div class="fixed-top">
+    <div class="container">
+        <div class="row">
+            {% if request.session.level %}
+                <div class="col-sm-6">
+                    <div id="loa" class="btn-group btn-group-sm pull-left" role="group" aria-label="Level of assurance">
+                    </div>
+                </div>
+            {% endif %}
+            {% if request.session.sign_identities %}
+                <div class="col-sm-6">
+                    <div id="sign" class="btn-group btn-group-sm pull-right" role="group"
+                         aria-label="Signing identities">
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"
+        integrity="sha384-feJI7QwhOS+hwpX2zkaeJQjeiwlhOP+SdQDqhgvvo1DsjtiSQByFdThsxO669S2D"
+        crossorigin="anonymous"></script>
+<!--script src="{% static 'js/app.js' %}"></script/-->
+{% block scripts %}<!-- scripts -->{% endblock %}
+<script type="application/javascript">
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    (function ($) {
+        $('form#langswitcher select').on('change', function () {
+            var $form = $(this).closest('form');
+            $form.submit();
+        });
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    })(jQuery);
+</script>
+
 </body>
 </html>

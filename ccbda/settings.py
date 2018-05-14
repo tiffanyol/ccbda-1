@@ -117,6 +117,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+    #    os.path.join(BASE_DIR, "bank", "static"),
+    #    os.path.join(BASE_DIR, "sign", "static"),
+    #    os.path.join(BASE_DIR, "home", "static"),
+]
 
 AUTH_SCOPE = config('AUTH_SCOPE',cast=lambda v: [s.strip() for s in v.split(',')])
 
