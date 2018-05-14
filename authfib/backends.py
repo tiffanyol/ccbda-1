@@ -9,7 +9,7 @@ UserModel = get_user_model()
 
 class Oauth2Backend:
     def authenticate(self, request, **kwargs):
-        result = apiCall(request, uri='jo/', accept='application/json')
+        result = apiCall(request, uri='jo/', accept_type='application/json')
         if result is None:
             return None
         username = kwargs.get(UserModel.USERNAME_FIELD)

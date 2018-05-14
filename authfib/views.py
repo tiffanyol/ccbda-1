@@ -35,7 +35,7 @@ def logout(request):
 
 def profile(request):
     if request.user.is_authenticated:
-        result = apiCall(request, uri='jo/', accept='application/json')
+        result = apiCall(request, uri='jo/', accept_type='application/json')
         return render(request, 'profile.html', result)
     return render(request, 'profile.html')
 

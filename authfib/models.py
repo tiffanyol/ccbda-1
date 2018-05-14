@@ -27,10 +27,12 @@ def apiGetToken(request, redirect_uri):
                              'IDP (%d) [%s]' % (getframeinfo(currentframe()).lineno, e.error))
         return False
 
-    request.session['token'] = '%s %s' % (token['token_type'], token['access_token'])
+    request.session['token_type'] = token['token_type']
+    request.session['access_token'] = token['access_token']
     request.session['refresh_token'] = token['refresh_token']
     request.session.set_expiry(token['expires_in'])
     return True
+
 
 def apiLogout(request):
     headers = {'Cache-Control': 'no-cache',
@@ -38,8 +40,8 @@ def apiLogout(request):
                'Content-Type': 'application/x-www-form-urlencoded',
                }
     data = {
+        'token': request.session['access_token'],
         'client_id': settings.AUTH_CLIENT_ID,
-        'token': request.session.get('token'),
     }
     response = requests.post(url=settings.AUTH_URL + 'o/revoke_token/', data=data, headers=headers)
     if response.status_code != 200:
@@ -49,17 +51,17 @@ def apiLogout(request):
     return
 
 
-def apiCall(request, uri, accept='application/json'):
+def apiCall(request, uri, accept_type='application/json'):
     headers = {'Cache-Control': 'no-cache',
-               'Accept': accept,
-               'Authorization': request.session.get('token'),
+               'Accept': accept_type,
+               'Authorization': '%s %s' % (request.session.get('token_type'), request.session['access_token']),
                }
     response = requests.get(url=settings.AUTH_URL + uri, headers=headers)
     if response.status_code != 200:
         messages.add_message(request, messages.ERROR,
                              'IDP (%d) [%s]' % (getframeinfo(currentframe()).lineno, response.reason))
         return None
-    if accept == 'application/json':
+    if accept_type == 'application/json':
         return json.loads(response.text)
     else:
         return None
