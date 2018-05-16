@@ -22,9 +22,8 @@ class Oauth2Backend:
             # Oauth2 authenticated user does not exist locally, create it!
             user = UserModel.objects.create_user(username=result['username'], first_name=result['nom'],
                                             last_name=result['cognoms'], email=result['email'])
-        else:
-            # User existed or has been created. Now check if it is active
-            return user if self.user_can_authenticate(user) else None
+        # User existed or has been created. Now check if it is active
+        return user if self.user_can_authenticate(user) else None
 
     def get_user(self, user_id):
         try:
